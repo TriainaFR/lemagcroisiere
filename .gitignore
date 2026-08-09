@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Éditeurs
+*.swp
+*~
+.vscode/
+.idea/
+
+# Fichiers temporaires de génération
+*.pdf.tmp
+images/*.pdf

@@ -1,0 +1,10 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "da-preview",
+      "url": "http://localhost:4873",
+      "port": 4873
+    }
+  ]
+}

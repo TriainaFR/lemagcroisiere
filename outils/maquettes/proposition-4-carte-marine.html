@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Mag Croisières — DA « Carte Marine »</title>
+<!-- Maquette de travail conservée pour référence, volontairement hors index. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chart:#EDF3F0;
+    --chart-2:#E2ECE8;
+    --bathy:#BAD5D2;
+    --bathy-2:#CEE1DD;
+    --ink:#0C3140;
+    --ink-2:#3D6472;
+    --deep:#12475A;
+    --buoy:#F0561D;
+    --stamp:#BC3F2C;
+    --cyan:#4E96A5;
+    --sans:"Familjen Grotesk",sans-serif;
+    --mono:"Fragment Mono",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--chart);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:
+      linear-gradient(rgba(12,49,64,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(12,49,64,.045) 1px,transparent 1px);
+    background-size:130px 130px;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 44px}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--mono)}
+
+  /* repères d'impression fixes */
+  .crop{position:fixed;width:26px;height:26px;z-index:60;pointer-events:none;opacity:.6}
+  .crop::before,.crop::after{content:"";position:absolute;background:var(--ink)}
+  .crop::before{width:100%;height:1px}
+  .crop::after{width:1px;height:100%}
+  .crop.tl{top:10px;left:10px}.crop.tl::before{top:0}.crop.tl::after{left:0}
+  .crop.tr{top:10px;right:10px}.crop.tr::before{top:0}.crop.tr::after{right:0}
+  .crop.bl{bottom:10px;left:10px}.crop.bl::before{bottom:0}.crop.bl::after{left:0}
+  .crop.br{bottom:10px;right:10px}.crop.br::before{bottom:0}.crop.br::after{right:0}
+
+  /* ---------- barre instruments ---------- */
+  .instr{border-bottom:1.5px solid var(--ink);background:var(--chart-2)}
+  .instr .wrap{display:flex;justify-content:space-between;align-items:center;height:40px;gap:20px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-2);text-transform:uppercase}
+  .instr b{color:var(--buoy);font-weight:400}
+  @media(max-width:900px){.instr .mid{display:none}}
+
+  /* ---------- header ---------- */
+  header{padding:34px 0 0;position:relative}
+  .head-grid{display:grid;grid-template-columns:150px 1fr 150px;align-items:center;gap:24px}
+  .roundel{width:132px;height:132px;transform:rotate(-9deg);opacity:.92}
+  .head-id{text-align:center}
+  .brandmark{
+    font-weight:700;letter-spacing:-.03em;line-height:.92;text-transform:uppercase;
+    font-size:clamp(40px,5.2vw,74px);
+  }
+  .brandmark .row2{display:block;color:var(--deep);letter-spacing:.01em}
+  .brandmark .row2 em{font-style:italic;color:var(--buoy)}
+  .head-sub{margin-top:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
+  .head-sub b{color:var(--stamp);font-weight:400}
+  .head-cta{justify-self:end;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+  .btn{
+    display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    padding:12px 18px;border:1.5px solid var(--ink);transition:.2s;background:var(--chart);
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .btn:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .btn.solid{background:var(--ink);color:var(--chart)}
+  .btn.orange{background:var(--buoy);border-color:var(--ink);color:#fff}
+  @media(max-width:980px){.head-grid{grid-template-columns:1fr}.roundel{display:none}.head-cta{display:none}}
+
+  nav.routes{margin-top:30px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+  .routes .wrap{display:flex;justify-content:center;gap:0;flex-wrap:wrap}
+  .routes a{
+    display:flex;align-items:baseline;gap:9px;padding:16px 26px;border-right:1px dashed rgba(12,49,64,.35);
+    font-size:13.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;transition:.15s;
+  }
+  .routes a:first-child{border-left:1px dashed rgba(12,49,64,.35)}
+  .routes a i{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--buoy)}
+  .routes a:hover{background:var(--ink);color:var(--chart)}
+  @media(max-width:760px){.routes a{padding:12px 14px;font-size:11.5px}}
+
+  /* ---------- hero : la carte ---------- */
+  .sea{position:relative;margin-top:0;border-bottom:1.5px solid var(--ink);overflow:hidden}
+  .sea .canvas{position:relative;height:660px}
+  .sea svg.map{position:absolute;inset:0;width:100%;height:100%}
+  .escale-card{
+    display:block;position:absolute;width:330px;background:#F7FAF8;border:1.5px solid var(--ink);
+    padding:20px 22px 18px;box-shadow:5px 6px 0 rgba(12,49,64,.85);
+    transition:transform .25s ease;
+  }
+  .escale-card:hover{transform:translateY(-4px) rotate(0deg)!important}
+  .escale-card .tag{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+  .escale-card .tag b{color:var(--buoy);font-weight:400}
+  .escale-card h3{margin:10px 0 8px;font-size:21px;font-weight:700;line-height:1.12;letter-spacing:-.015em}
+  .escale-card p{font-size:13.5px;line-height:1.45;color:var(--ink-2)}
+  .escale-card .meta{margin-top:12px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);border-top:1px dashed rgba(12,49,64,.3);padding-top:10px}
+  .ec1{left:4%;top:52%;transform:rotate(-1.4deg)}
+  .ec2{left:36%;top:9%;transform:rotate(.8deg)}
+  .ec3{right:4%;top:46%;transform:rotate(-.6deg)}
+  .ec1 .stamp-alaune{
+    position:absolute;top:-26px;right:-30px;transform:rotate(8deg);
+    font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--stamp);
+    border:2px solid var(--stamp);border-radius:6px;padding:7px 12px;text-transform:uppercase;
+    background:rgba(247,250,248,.85);
+  }
+  .sea .legendbox{
+    position:absolute;left:44px;top:34px;border:1.5px solid var(--ink);background:var(--chart);
+    padding:14px 18px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);
+    line-height:2;
+  }
+  .legendbox b{display:block;color:var(--ink);font-weight:400;border-bottom:1px solid var(--ink);margin-bottom:6px;padding-bottom:4px;letter-spacing:.2em}
+  .legendbox .sym{color:var(--buoy)}
+  @media(max-width:1080px){
+    .sea .canvas{height:auto;padding:40px 0}
+    .sea svg.map{display:none}
+    .escale-card{position:static;width:min(480px,100%);margin:18px auto;transform:none!important}
+    .sea .legendbox{display:none}
+    .ec1 .stamp-alaune{top:-18px;right:6px}
+  }
+
+  /* dash animée */
+  .routepath{stroke-dasharray:10 9;animation:dash 30s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-380}}
+  @media(prefers-reduced-motion:reduce){.routepath{animation:none}}
+
+  /* ---------- bandes sections ---------- */
+  section{padding:92px 0}
+  .sechead{display:flex;align-items:center;gap:24px;margin-bottom:48px}
+  .sechead .no{
+    flex:none;width:52px;height:52px;border:1.5px solid var(--ink);border-radius:50%;
+    display:grid;place-items:center;font-family:var(--mono);font-size:13px;background:var(--chart);
+    box-shadow:3px 3px 0 rgba(12,49,64,.25);
+  }
+  .sechead h2{font-size:clamp(30px,3.6vw,46px);font-weight:700;letter-spacing:-.02em;text-transform:uppercase}
+  .sechead h2 em{font-style:italic;color:var(--buoy)}
+  .sechead .fill{flex:1;border-top:1px dashed rgba(12,49,64,.4);position:relative;top:2px}
+  .sechead .more{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--deep);white-space:nowrap;border-bottom:1.5px solid var(--buoy);padding-bottom:3px}
+  .sechead .more:hover{color:var(--buoy)}
+
+  /* ---------- relevé des compagnies ---------- */
+  .releve{background:var(--deep);color:#EAF3F1;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);position:relative}
+  .releve::before{content:"";position:absolute;inset:0;opacity:.35;
+    background-image:linear-gradient(rgba(234,243,241,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(234,243,241,.07) 1px,transparent 1px);
+    background-size:130px 130px}
+  .releve .wrap{position:relative}
+  .releve .sechead h2{color:#EAF3F1}
+  .releve .sechead .no{background:transparent;color:#EAF3F1;border-color:#EAF3F1;box-shadow:3px 3px 0 rgba(0,0,0,.3)}
+  .releve .sechead .fill{border-color:rgba(234,243,241,.35)}
+  .releve .sechead .more{color:#EAF3F1}
+  .cartouche{border:1.5px solid #EAF3F1;position:relative;background:rgba(9,38,48,.55)}
+  .cartouche::before{content:"";position:absolute;inset:5px;border:1px solid rgba(234,243,241,.35);pointer-events:none}
+  .cartouche .title{
+    position:absolute;top:-14px;left:34px;background:var(--buoy);color:#fff;
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:6px 14px;
+  }
+  .rrow{display:grid;grid-template-columns:84px 1.15fr 1.5fr 120px;gap:26px;align-items:center;padding:24px 34px;border-bottom:1px dashed rgba(234,243,241,.3);position:relative}
+  .rrow:last-of-type{border-bottom:none}
+  .rrow:hover{background:rgba(234,243,241,.05)}
+  .rrow .rk{font-family:var(--mono);font-size:26px;color:#EAF3F1}
+  .rrow .rk i{font-style:normal;font-size:11px;color:var(--buoy)}
+  .rrow h3{font-size:22px;font-weight:700;letter-spacing:-.01em;text-transform:uppercase}
+  .rrow .tg{margin-top:4px;font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8FC1BC}
+  .rrow .obs{font-size:14.5px;line-height:1.45;color:rgba(234,243,241,.8);font-style:italic}
+  .sonde{justify-self:end;text-align:center;font-family:var(--mono)}
+  .sonde b{display:block;font-size:30px;font-weight:400;color:#FFB48A}
+  .sonde i{font-style:normal;font-size:9px;letter-spacing:.16em;color:rgba(234,243,241,.6)}
+  .sonde svg{display:block;margin:4px auto 0}
+  .releve .foot{display:flex;gap:22px;align-items:center;margin-top:40px;flex-wrap:wrap}
+  .releve .foot .note{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(234,243,241,.65);max-width:52ch;line-height:1.9}
+  @media(max-width:960px){
+    .rrow{grid-template-columns:56px 1fr 96px;gap:16px;padding:20px 18px}
+    .rrow .obs{display:none}
+  }
+
+  /* ---------- destinations : zones de la carte ---------- */
+  .zones{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .zone{
+    border:1.5px solid var(--ink);background:#F5F9F7;position:relative;
+    padding:0 0 20px;transition:transform .25s,box-shadow .25s;box-shadow:4px 4px 0 rgba(12,49,64,.2);
+  }
+  .zone:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 rgba(12,49,64,.35)}
+  .zone .frag{display:block;border-bottom:1.5px solid var(--ink)}
+  .zone .frag svg{display:block;width:100%;height:auto}
+  .zone .zh{display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px 4px}
+  .zone h3{font-size:21px;font-weight:700;letter-spacing:-.01em;text-transform:uppercase}
+  .zone .co{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink-2)}
+  .zone .zc{padding:0 20px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--buoy)}
+  .zone .corner{position:absolute;font-family:var(--mono);font-size:8.5px;color:var(--ink-2);letter-spacing:.08em}
+  .zone .corner.a{top:6px;left:8px}.zone .corner.b{top:6px;right:8px}
+  @media(max-width:980px){.zones{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.zones{grid-template-columns:1fr}}
+
+  /* ---------- instructions nautiques ---------- */
+  .instructions{display:grid;grid-template-columns:5fr 7fr;gap:70px;align-items:start}
+  .instructions .intro .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--buoy)}
+  .instructions .intro h2{font-size:clamp(30px,3.4vw,44px);font-weight:700;letter-spacing:-.02em;text-transform:uppercase;margin:14px 0 18px;line-height:1}
+  .instructions .intro p{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:44ch}
+  .instructions .intro .warn{
+    margin-top:26px;border:1.5px solid var(--buoy);padding:16px 18px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;line-height:2;color:var(--ink);
+    background:rgba(240,86,29,.06);
+  }
+  .ilist{border-top:1.5px solid var(--ink)}
+  .iitem{display:grid;grid-template-columns:64px 1fr 28px;gap:18px;align-items:center;padding:20px 0;border-bottom:1px dashed rgba(12,49,64,.4)}
+  .iitem .d{width:34px;height:34px;transform:rotate(45deg);border:1.5px solid var(--ink);display:grid;place-items:center;background:#F5F9F7}
+  .iitem .d span{transform:rotate(-45deg);font-family:var(--mono);font-size:11px}
+  .iitem h3{font-size:19px;font-weight:600;letter-spacing:-.01em}
+  .iitem:hover h3{color:var(--buoy)}
+  .iitem .a{font-size:18px;color:var(--buoy);opacity:0;transform:translateX(-6px);transition:.2s}
+  .iitem:hover .a{opacity:1;transform:none}
+  @media(max-width:960px){.instructions{grid-template-columns:1fr;gap:38px}}
+
+  /* ---------- avis aux navigateurs (FAQ) ---------- */
+  .avis{background:var(--chart-2);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+  .avis .sub{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:-30px 0 40px}
+  .avis details{border:1.5px solid var(--ink);background:var(--chart);margin-bottom:14px;box-shadow:3px 3px 0 rgba(12,49,64,.2)}
+  .avis summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:120px 1fr 44px;gap:18px;align-items:center;padding:0}
+  .avis summary::-webkit-details-marker{display:none}
+  .avis summary .no{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--chart);background:var(--ink);align-self:stretch;display:grid;place-items:center;text-align:center;line-height:1.6;padding:14px 8px}
+  .avis summary h3{font-size:18.5px;font-weight:600;letter-spacing:-.01em;padding:16px 0}
+  .avis summary .pm{font-family:var(--mono);font-size:18px;color:var(--buoy);text-align:center}
+  .avis details[open] summary .pm{transform:rotate(45deg)}
+  .avis .rep{padding:4px 24px 20px 138px;font-size:15px;line-height:1.55;color:var(--ink-2);max-width:78ch}
+  .avis .rep b{color:var(--ink)}
+  @media(max-width:760px){
+    .avis summary{grid-template-columns:1fr 40px}
+    .avis summary .no{display:none}
+    .avis summary h3{padding:16px 0 16px 18px}
+    .avis .rep{padding:0 18px 20px}
+  }
+
+  /* ---------- bulletin (newsletter) ---------- */
+  .bulletin .box{
+    max-width:900px;margin:0 auto;border:1.5px solid var(--ink);background:#F7FAF8;position:relative;
+    box-shadow:6px 7px 0 rgba(12,49,64,.85);
+  }
+  .bulletin .head{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--ink);padding:14px 26px;background:var(--chart-2);
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+  .bulletin .head b{color:var(--ink);font-weight:400}
+  .bulletin .body{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;padding:38px 40px;align-items:center}
+  .bulletin h2{font-size:clamp(26px,3vw,38px);font-weight:700;letter-spacing:-.02em;text-transform:uppercase;line-height:1}
+  .bulletin h2 em{font-style:italic;color:var(--buoy)}
+  .bulletin p{margin-top:12px;font-size:15px;line-height:1.55;color:var(--ink-2)}
+  .bulletin form{display:flex;border:1.5px solid var(--ink);background:#fff}
+  .bulletin input{flex:1;border:none;outline:none;padding:16px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);min-width:0;background:transparent}
+  .bulletin button{border:none;cursor:pointer;background:var(--ink);color:var(--chart);font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;padding:0 22px;transition:.2s}
+  .bulletin button:hover{background:var(--buoy)}
+  .bulletin .gr{margin-top:12px;font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+  .stamp-free{
+    position:absolute;top:-24px;right:-20px;transform:rotate(10deg);
+    width:96px;height:96px;
+  }
+  @media(max-width:820px){.bulletin .body{grid-template-columns:1fr;gap:24px;padding:28px 22px}}
+
+  /* ---------- footer légende ---------- */
+  footer{background:var(--ink);color:#DFEBE8;padding:76px 0 0;position:relative}
+  .leg-row{display:flex;gap:34px;flex-wrap:wrap;border:1px dashed rgba(223,235,232,.4);padding:22px 28px;margin-bottom:60px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(223,235,232,.75)}
+  .leg-row .it{display:flex;align-items:center;gap:12px}
+  .leg-row svg{flex:none}
+  .fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.2fr;gap:44px}
+  .fbrand{font-weight:700;font-size:26px;letter-spacing:-.02em;text-transform:uppercase;line-height:1}
+  .fbrand em{font-style:italic;color:#FFB48A}
+  .fdesc{margin-top:14px;font-size:14px;line-height:1.6;color:rgba(223,235,232,.7);max-width:30ch}
+  .fcol h4{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:#8FC1BC;margin-bottom:18px}
+  .fcol a{display:block;font-size:14.5px;font-weight:500;padding:4px 0;color:rgba(223,235,232,.85)}
+  .fcol a:hover{color:#FFB48A}
+  .fbot{margin-top:64px;border-top:1px solid rgba(223,235,232,.25);padding:20px 0 24px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(223,235,232,.5)}
+  .fbot .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  @media(max-width:920px){.fgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+
+  /* ---------- switcher ---------- */
+  .switcher{
+    position:fixed;bottom:16px;right:16px;z-index:1000;
+    background:#F7FAF8;color:var(--ink);border:1.5px solid var(--ink);
+    font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+    display:flex;align-items:center;gap:10px;padding:9px 13px;
+    box-shadow:4px 4px 0 rgba(12,49,64,.8);
+  }
+  .switcher b{color:var(--buoy);font-weight:400}
+  .switcher a{padding:2px 6px;border:1px solid transparent}
+  .switcher a:hover{border-color:var(--ink)}
+  .switcher a.on{background:var(--ink);color:var(--chart)}
+
+  /* reveal */
+  .rev{opacity:0;transform:translateY(16px);animation:rev .7s cubic-bezier(.2,.6,.2,1) forwards}
+  .d1{animation-delay:.05s}.d2{animation-delay:.14s}.d3{animation-delay:.24s}.d4{animation-delay:.36s}
+  @keyframes rev{to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.rev{animation:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+
+<!-- barre instruments -->
+<div class="instr">
+  <div class="wrap">
+    <span>Carte Nº 01 — <b>Été 2026</b></span>
+    <span class="mid">Sondes en mètres · Routes en jours · Avis rectifiés chaque jeudi</span>
+    <span>Position : 43°17′N — 5°22′E · <b>Cap au 220</b></span>
+  </div>
+</div>
+
+<!-- header -->
+<header>
+  <div class="wrap head-grid">
+    <!-- tampon -->
+    <svg class="roundel rev d1" viewBox="0 0 132 132" fill="none">
+      <defs><path id="circ" d="M66,66 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>
+      <circle cx="66" cy="66" r="63" stroke="#BC3F2C" stroke-width="2.5"/>
+      <circle cx="66" cy="66" r="52" stroke="#BC3F2C" stroke-width="1"/>
+      <text font-family="Fragment Mono" font-size="10.5" letter-spacing="2.5" fill="#BC3F2C">
+        <textPath href="#circ">LE MAG CROISIÈRES · RELEVÉS &amp; TRAVERSÉES ·</textPath>
+      </text>
+      <path d="M66 44 v34 M66 78 q-13 -3 -17 -13 M66 78 q13 -3 17 -13 M56 52 h20" stroke="#BC3F2C" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <circle cx="66" cy="40" r="5" stroke="#BC3F2C" stroke-width="3"/>
+    </svg>
+
+    <div class="head-id">
+      <h1 class="brandmark rev d1">Le Mag<span class="row2"><em>Croisières</em></span></h1>
+      <div class="head-sub rev d2">Le média qui cartographie la croisière — <b>tests, palmarès, escales</b></div>
+    </div>
+
+    <div class="head-cta rev d2">
+      <a class="btn orange" href="#bulletin">S'abonner</a>
+      <a class="btn" href="#">Rechercher</a>
+    </div>
+  </div>
+
+  <nav class="routes rev d3">
+    <div class="wrap">
+      <a href="#"><i>R-01</i>Destinations</a>
+      <a href="#"><i>R-02</i>Compagnies</a>
+      <a href="#releve"><i>R-03</i>Palmarès</a>
+      <a href="#"><i>R-04</i>Guides</a>
+      <a href="#"><i>R-05</i>Actualités</a>
+      <a href="#"><i>R-06</i>Bons plans</a>
+    </div>
+  </nav>
+</header>
+
+<!-- hero : la carte aux 3 escales -->
+<div class="sea">
+  <div class="canvas wrap" style="max-width:1280px">
+    <svg class="map" viewBox="0 0 1280 660" preserveAspectRatio="xMidYMid slice" fill="none">
+      <!-- courbes bathymétriques -->
+      <g stroke="#BAD5D2" stroke-width="1.5" fill="none">
+        <path d="M-40 520 C 180 430, 300 560, 520 500 S 900 380, 1320 470"/>
+        <path d="M-40 570 C 200 480, 320 610, 560 550 S 940 430, 1320 520" opacity=".7"/>
+        <path d="M-40 620 C 220 540, 340 660, 600 600 S 980 480, 1320 570" opacity=".45"/>
+        <path d="M160 -20 C 120 90, 240 160, 180 260 S 60 380, 140 480" opacity=".6"/>
+        <path d="M1160 -30 C 1120 80, 1240 150, 1180 250 S 1080 360, 1150 470" opacity=".6"/>
+        <ellipse cx="700" cy="330" rx="260" ry="120" opacity=".35"/>
+        <ellipse cx="700" cy="330" rx="180" ry="78" opacity=".5"/>
+        <ellipse cx="700" cy="330" rx="100" ry="40" opacity=".7"/>
+      </g>
+      <!-- sondes -->
+      <g font-family="Fragment Mono" font-size="11" fill="#7FA6A3">
+        <text x="240" y="170">128</text><text x="480" y="90">64</text><text x="860" y="140">212</text>
+        <text x="1060" y="300">87</text><text x="340" y="420">156</text><text x="960" y="520">340</text>
+        <text x="120" y="330">98</text><text x="700" y="336" fill="#5C8B88">1 042</text><text x="560" y="620">183</text>
+      </g>
+      <!-- graticule labels -->
+      <g font-family="Fragment Mono" font-size="9" fill="#9AB3B0" letter-spacing="2">
+        <text x="18" y="24">44°N</text><text x="18" y="350">43°N</text><text x="18" y="648">42°N</text>
+        <text x="420" y="652">5°E</text><text x="850" y="652">6°E</text><text x="1230" y="652">7°E</text>
+      </g>
+      <!-- rose des vents -->
+      <g transform="translate(1130,120)">
+        <circle r="56" stroke="#0C3140" stroke-width="1"/>
+        <circle r="42" stroke="#0C3140" stroke-width=".6" opacity=".5"/>
+        <path d="M0 -52 L7 0 L0 52 L-7 0 Z" fill="#0C3140"/>
+        <path d="M-52 0 L0 -7 L52 0 L0 7 Z" fill="#F0561D"/>
+        <circle r="4" fill="#0C3140"/>
+        <text x="-4" y="-62" font-family="Fragment Mono" font-size="11" fill="#0C3140">N</text>
+      </g>
+      <!-- phare -->
+      <g transform="translate(96,150)">
+        <path d="M-9 34 L-4 0 L4 0 L9 34 Z" fill="#0C3140"/>
+        <rect x="-6" y="-10" width="12" height="10" fill="#F0561D"/>
+        <path d="M-26 -6 L-8 -3 M26 -6 L8 -3" stroke="#F0561D" stroke-width="2"/>
+        <text x="-30" y="52" font-family="Fragment Mono" font-size="9" fill="#0C3140" letter-spacing="1">FEU 2 ECL. 10S</text>
+      </g>
+      <!-- épave -->
+      <g transform="translate(520,560)" stroke="#7FA6A3" stroke-width="1.6">
+        <path d="M-10 0 h20 M0 -10 v20 M-7 -7 l14 14 M7 -7 l-14 14"/>
+        <text x="14" y="4" font-family="Fragment Mono" font-size="9" fill="#7FA6A3" stroke="none">ÉPAVE</text>
+      </g>
+      <!-- route pointillée reliant les escales -->
+      <path class="routepath" d="M 90 610 C 200 560, 160 480, 250 430 S 420 300, 500 220 S 620 120, 760 140 S 980 240, 1060 330"
+        stroke="#F0561D" stroke-width="2.5" fill="none"/>
+      <!-- flèche fin de route -->
+      <path d="M1060 330 l-16 -4 M1060 330 l-6 -15" stroke="#F0561D" stroke-width="2.5"/>
+      <!-- marqueurs escales -->
+      <g>
+        <circle cx="250" cy="430" r="11" fill="#F0561D" stroke="#0C3140" stroke-width="2"/>
+        <text x="243.5" y="434.5" font-family="Fragment Mono" font-size="11" fill="#fff">1</text>
+        <circle cx="560" cy="170" r="11" fill="#F0561D" stroke="#0C3140" stroke-width="2"/>
+        <text x="553.5" y="174.5" font-family="Fragment Mono" font-size="11" fill="#fff">2</text>
+        <circle cx="1000" cy="290" r="11" fill="#F0561D" stroke="#0C3140" stroke-width="2"/>
+        <text x="993.5" y="294.5" font-family="Fragment Mono" font-size="11" fill="#fff">3</text>
+      </g>
+      <!-- départ -->
+      <g transform="translate(90,610)">
+        <path d="M0 -14 v10 M0 0 q-5 -1 -7 -5 M0 0 q5 -1 7 -5" stroke="#0C3140" stroke-width="2.5" fill="none"/>
+        <circle cx="0" cy="-16" r="2.5" stroke="#0C3140" stroke-width="2" fill="none"/>
+        <text x="12" y="4" font-family="Fragment Mono" font-size="9" fill="#0C3140" letter-spacing="1">DÉPART · MARSEILLE</text>
+      </g>
+    </svg>
+
+    <div class="legendbox rev d2">
+      <b>Légende</b>
+      <span class="sym">●</span> escale = article&nbsp;&nbsp;·&nbsp;&nbsp;<span class="sym">- - -</span> route de lecture<br>
+      sondes en minutes de lecture
+    </div>
+
+    <a class="escale-card ec1 rev d2" href="#">
+      <span class="stamp-alaune">À la une</span>
+      <div class="tag"><span><b>Escale 01</b> · Destination de l'année</span><span>61°N</span></div>
+      <h3>Fjords de Norvège : la majesté, sans les embouteillages</h3>
+      <p>Six itinéraires comparés, trois compagnies testées à bord. Le dossier de référence 2026.</p>
+      <div class="meta">Claire Aubry · Sonde : 12 min · Rectifié le 28.07.2026</div>
+    </a>
+    <a class="escale-card ec2 rev d3" href="#">
+      <div class="tag"><span><b>Escale 02</b> · Test à bord</span><span>16/20</span></div>
+      <h3>MSC World Europa : le géant qui veut tout faire</h3>
+      <p>Huit jours à bord du plus grand navire de Méditerranée, ponts et buffets au crible.</p>
+      <div class="meta">Julien Ferrand · Sonde : 9 min</div>
+    </a>
+    <a class="escale-card ec3 rev d4" href="#">
+      <div class="tag"><span><b>Escale 03</b> · Fluvial</span><span>41°N</span></div>
+      <h3>Sur le Douro, la croisière se met au vin nature</h3>
+      <p>Petits navires, quintas familiales et œnologues embarqués dans la vallée portugaise.</p>
+      <div class="meta">Marion Vialatte · Sonde : 7 min</div>
+    </a>
+  </div>
+</div>
+
+<!-- relevé des compagnies -->
+<section class="releve" id="releve">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="no">02</span>
+      <h2>Relevé des <em>compagnies</em></h2>
+      <span class="fill"></span>
+      <a class="more" href="#">Les 41 compagnies sondées ⟶</a>
+    </div>
+    <div class="cartouche">
+      <span class="title">Sondage 2026 — 9 critères — zéro complaisance</span>
+      <div class="rrow">
+        <div class="rk"><i>Nº</i>01</div>
+        <div><h3>Ponant</h3><div class="tg">Luxe &amp; expéditions</div></div>
+        <div class="obs">« L'excellence française, du carré au pont supérieur. Personne ne fait mieux en petite capacité. »</div>
+        <div class="sonde"><b>17,5</b><i>/20</i><svg width="34" height="8" viewBox="0 0 34 8"><path d="M1 4 q4 -4 8 0 t8 0 t8 0 t8 0" stroke="#FFB48A" fill="none" stroke-width="1.4"/></svg></div>
+      </div>
+      <div class="rrow">
+        <div class="rk"><i>Nº</i>02</div>
+        <div><h3>Royal Caribbean</h3><div class="tg">Méga-navires</div></div>
+        <div class="obs">« La démesure maîtrisée : la logistique ne craque jamais, même à 6 000 passagers. »</div>
+        <div class="sonde"><b>16,5</b><i>/20</i><svg width="34" height="8" viewBox="0 0 34 8"><path d="M1 4 q4 -4 8 0 t8 0 t8 0 t8 0" stroke="#FFB48A" fill="none" stroke-width="1.4"/></svg></div>
+      </div>
+      <div class="rrow">
+        <div class="rk"><i>Nº</i>03</div>
+        <div><h3>MSC Croisières</h3><div class="tg">Familles &amp; Méditerranée</div></div>
+        <div class="obs">« Le meilleur rapport mer-prix d'Europe, à condition de bien choisir sa cabine. »</div>
+        <div class="sonde"><b>16,0</b><i>/20</i><svg width="34" height="8" viewBox="0 0 34 8"><path d="M1 4 q4 -4 8 0 t8 0 t8 0 t8 0" stroke="#FFB48A" fill="none" stroke-width="1.4"/></svg></div>
+      </div>
+      <div class="rrow">
+        <div class="rk"><i>Nº</i>04</div>
+        <div><h3>Norwegian</h3><div class="tg">Liberté à bord</div></div>
+        <div class="obs">« Le “sans horaires, sans dress code” qui tient réellement ses promesses. »</div>
+        <div class="sonde"><b>15,5</b><i>/20</i><svg width="34" height="8" viewBox="0 0 34 8"><path d="M1 4 q4 -4 8 0 t8 0 t8 0 t8 0" stroke="#FFB48A" fill="none" stroke-width="1.4"/></svg></div>
+      </div>
+      <div class="rrow">
+        <div class="rk"><i>Nº</i>05</div>
+        <div><h3>CFC Croisières</h3><div class="tg">Pavillon francophone</div></div>
+        <div class="obs">« L'esprit paquebot d'antan, une clientèle fidèle, des tarifs encore doux. »</div>
+        <div class="sonde"><b>15,0</b><i>/20</i><svg width="34" height="8" viewBox="0 0 34 8"><path d="M1 4 q4 -4 8 0 t8 0 t8 0 t8 0" stroke="#FFB48A" fill="none" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="foot">
+      <a class="btn solid" style="box-shadow:3px 3px 0 rgba(0,0,0,.4);border-color:#EAF3F1" href="#">Méthodologie complète</a>
+      <p class="note">Qui teste, comment, qui paie quoi : tout est écrit noir sur blanc. Les notes ne sont ni sponsorisées, ni négociables.</p>
+    </div>
+  </div>
+</section>
+
+<!-- zones / destinations -->
+<section>
+  <div class="wrap">
+    <div class="sechead">
+      <span class="no">03</span>
+      <h2>Zones de <em>navigation</em></h2>
+      <span class="fill"></span>
+      <a class="more" href="#">Toutes les destinations ⟶</a>
+    </div>
+    <div class="zones">
+      <a class="zone" href="#">
+        <span class="corner a">Z-01</span><span class="corner b">AVR→NOV</span>
+        <span class="frag"><svg viewBox="0 0 400 150" fill="none">
+          <rect width="400" height="150" fill="#E7F0ED"/>
+          <path d="M0 40 C60 20, 120 60, 180 38 S 300 10, 400 44 L400 0 L0 0 Z" fill="#D8C9A8"/>
+          <path d="M0 40 C60 20, 120 60, 180 38 S 300 10, 400 44" stroke="#0C3140" stroke-width="1.6"/>
+          <path d="M0 74 C70 56, 140 92, 210 70 S 330 44, 400 76" stroke="#BAD5D2" stroke-width="1.3"/>
+          <path d="M0 106 C80 90, 150 122, 220 102 S 340 78, 400 108" stroke="#BAD5D2" stroke-width="1.3" opacity=".6"/>
+          <circle cx="150" cy="96" r="7" fill="#F0561D" stroke="#0C3140" stroke-width="1.6"/>
+          <text x="164" y="100" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">MARSEILLE</text>
+          <text x="300" y="130" font-family="Fragment Mono" font-size="10" fill="#7FA6A3">128</text>
+        </svg></span>
+        <div class="zh"><h3>Méditerranée</h3><span class="co">43°N·7°E</span></div>
+        <div class="zc">184 itinéraires — dès 690 €</div>
+      </a>
+      <a class="zone" href="#">
+        <span class="corner a">Z-02</span><span class="corner b">MAI→SEPT</span>
+        <span class="frag"><svg viewBox="0 0 400 150" fill="none">
+          <rect width="400" height="150" fill="#E7F0ED"/>
+          <path d="M0 0 L92 0 L120 70 L96 150 L60 150 L84 78 L52 0 Z" fill="#D8C9A8"/>
+          <path d="M92 0 L120 70 L96 150 M52 0 L84 78 L60 150" stroke="#0C3140" stroke-width="1.6" fill="none"/>
+          <path d="M160 30 h200 M180 70 h180 M170 110 h190" stroke="#BAD5D2" stroke-width="1.3"/>
+          <circle cx="108" cy="64" r="7" fill="#F0561D" stroke="#0C3140" stroke-width="1.6"/>
+          <text x="122" y="68" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">GEIRANGER</text>
+          <text x="320" y="132" font-family="Fragment Mono" font-size="10" fill="#7FA6A3">212</text>
+        </svg></span>
+        <div class="zh"><h3>Fjords &amp; Baltique</h3><span class="co">61°N·6°E</span></div>
+        <div class="zc">96 itinéraires — dès 1 190 €</div>
+      </a>
+      <a class="zone" href="#">
+        <span class="corner a">Z-03</span><span class="corner b">NOV→AVR</span>
+        <span class="frag"><svg viewBox="0 0 400 150" fill="none">
+          <rect width="400" height="150" fill="#E7F0ED"/>
+          <g fill="#D8C9A8" stroke="#0C3140" stroke-width="1.4">
+            <ellipse cx="90" cy="46" rx="34" ry="14"/>
+            <ellipse cx="210" cy="90" rx="26" ry="11"/>
+            <ellipse cx="320" cy="50" rx="30" ry="12"/>
+          </g>
+          <path d="M40 120 q30 -14 60 0 t60 0 t60 0 t60 0 t60 0" stroke="#BAD5D2" stroke-width="1.3" fill="none"/>
+          <circle cx="210" cy="90" r="6" fill="#F0561D" stroke="#0C3140" stroke-width="1.6"/>
+          <text x="224" y="94" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">FORT-DE-FRANCE</text>
+        </svg></span>
+        <div class="zh"><h3>Caraïbes</h3><span class="co">15°N·61°O</span></div>
+        <div class="zc">122 itinéraires — dès 1 040 €</div>
+      </a>
+      <a class="zone" href="#">
+        <span class="corner a">Z-04</span><span class="corner b">TOUTE L'ANNÉE</span>
+        <span class="frag"><svg viewBox="0 0 400 150" fill="none">
+          <rect width="400" height="150" fill="#E7F0ED"/>
+          <rect width="400" height="150" fill="#D8C9A8" opacity=".55"/>
+          <path d="M0 84 C70 60, 130 108, 200 84 S 330 56, 400 88" stroke="#4E96A5" stroke-width="7" fill="none"/>
+          <path d="M120 84 v-26 M282 82 v-26" stroke="#0C3140" stroke-width="2"/>
+          <circle cx="120" cy="52" r="5" fill="#F0561D" stroke="#0C3140" stroke-width="1.4"/>
+          <circle cx="282" cy="50" r="5" fill="#F0561D" stroke="#0C3140" stroke-width="1.4"/>
+          <text x="96" y="40" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">VIENNE</text>
+          <text x="256" y="38" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">BUDAPEST</text>
+        </svg></span>
+        <div class="zh"><h3>Fleuves d'Europe</h3><span class="co">48°N·16°E</span></div>
+        <div class="zc">141 itinéraires — dès 780 €</div>
+      </a>
+      <a class="zone" href="#">
+        <span class="corner a">Z-05</span><span class="corner b">AVR→OCT</span>
+        <span class="frag"><svg viewBox="0 0 400 150" fill="none">
+          <rect width="400" height="150" fill="#E7F0ED"/>
+          <g fill="#D8C9A8" stroke="#0C3140" stroke-width="1.4">
+            <path d="M60 30 L120 22 L150 58 L110 84 L58 70 Z"/>
+            <ellipse cx="250" cy="60" rx="24" ry="16"/>
+            <ellipse cx="330" cy="104" rx="20" ry="12"/>
+          </g>
+          <path d="M20 130 q30 -12 60 0 t60 0 t60 0 t60 0 t60 0" stroke="#BAD5D2" stroke-width="1.3" fill="none"/>
+          <circle cx="250" cy="60" r="6" fill="#F0561D" stroke="#0C3140" stroke-width="1.6"/>
+          <text x="264" y="64" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">SANTORIN</text>
+        </svg></span>
+        <div class="zh"><h3>Grèce &amp; Adriatique</h3><span class="co">37°N·25°E</span></div>
+        <div class="zc">88 itinéraires — dès 840 €</div>
+      </a>
+      <a class="zone" href="#">
+        <span class="corner a">Z-06</span><span class="corner b">NOV→MARS</span>
+        <span class="frag"><svg viewBox="0 0 400 150" fill="none">
+          <rect width="400" height="150" fill="#E7F0ED"/>
+          <path d="M0 110 L70 40 L120 88 L170 24 L240 96 L300 48 L400 116 L400 150 L0 150 Z" fill="#F7FAF8" stroke="#0C3140" stroke-width="1.4"/>
+          <path d="M0 128 h400" stroke="#4E96A5" stroke-width="2"/>
+          <circle cx="240" cy="96" r="6" fill="#F0561D" stroke="#0C3140" stroke-width="1.6"/>
+          <text x="254" y="100" font-family="Fragment Mono" font-size="9.5" fill="#0C3140" letter-spacing="1">USHUAÏA</text>
+          <text x="40" y="30" font-family="Fragment Mono" font-size="10" fill="#7FA6A3">-1 042</text>
+        </svg></span>
+        <div class="zh"><h3>Grand Nord &amp; Antarctique</h3><span class="co">64°S·62°O</span></div>
+        <div class="zc">34 expéditions — dès 6 900 €</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- instructions nautiques -->
+<section style="padding-top:8px">
+  <div class="wrap instructions">
+    <div class="intro">
+      <div class="k">Rubrique 04 — Guides pratiques</div>
+      <h2>Instructions nautiques</h2>
+      <p>Les dossiers de référence du passager : réécrits à chaque saison, tarifs vérifiés, relus par des membres d'équipage. Embarquez en sachant exactement à quoi vous attendre.</p>
+      <div class="warn">⚠ Rédigé par des humains qui embarquent vraiment. Aucun guide généré à la chaîne.</div>
+    </div>
+    <div class="ilist">
+      <a class="iitem" href="#"><span class="d"><span>01</span></span><h3>Première croisière : le guide anti-erreurs</h3><span class="a">⟶</span></a>
+      <a class="iitem" href="#"><span class="d"><span>02</span></span><h3>Quelle cabine choisir — et lesquelles fuir</h3><span class="a">⟶</span></a>
+      <a class="iitem" href="#"><span class="d"><span>03</span></span><h3>Le vrai budget d'une semaine en mer, poste par poste</h3><span class="a">⟶</span></a>
+      <a class="iitem" href="#"><span class="d"><span>04</span></span><h3>Pourboires à bord : règles, montants, pièges</h3><span class="a">⟶</span></a>
+      <a class="iitem" href="#"><span class="d"><span>05</span></span><h3>Embarquer avec des enfants sans y laisser sa patience</h3><span class="a">⟶</span></a>
+      <a class="iitem" href="#"><span class="d"><span>06</span></span><h3>Mal de mer : ce qui marche, ce qui rassure, ce qui ment</h3><span class="a">⟶</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- avis aux navigateurs -->
+<section class="avis">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="no">05</span>
+      <h2>Avis aux <em>navigateurs</em></h2>
+      <span class="fill"></span>
+    </div>
+    <p class="sub">Réponses courtes, sourcées, datées — rectifiées comme une carte marine, chaque semaine.</p>
+
+    <details open>
+      <summary><span class="no">AVIS<br>2026-01</span><h3>Quelle est la meilleure période pour une croisière en Méditerranée ?</h3><span class="pm">+</span></summary>
+      <div class="rep"><b>Mai-juin et septembre-octobre.</b> Températures idéales, escales moins saturées, tarifs de 15 à 30 % inférieurs à ceux de juillet-août. L'hiver reste possible sur les grands navires, davantage tournés vers la vie à bord.</div>
+    </details>
+    <details>
+      <summary><span class="no">AVIS<br>2026-02</span><h3>Combien coûte réellement une croisière « tout compris » ?</h3><span class="pm">+</span></summary>
+      <div class="rep">Prix catalogue <b>+ 25 à 40 %</b> en moyenne : pourboires automatiques, boissons hors formule, excursions et Wi-Fi. Notre simulateur de budget détaille ces postes compagnie par compagnie.</div>
+    </details>
+    <details>
+      <summary><span class="no">AVIS<br>2026-03</span><h3>Faut-il un passeport pour une croisière au départ de Marseille ?</h3><span class="pm">+</span></summary>
+      <div class="rep">Itinéraire 100 % Union européenne : la <b>carte d'identité en cours de validité suffit</b>. Passeport obligatoire dès qu'une escale sort de Schengen — Tunisie, Turquie, Monténégro notamment.</div>
+    </details>
+    <details>
+      <summary><span class="no">AVIS<br>2026-04</span><h3>Quelle compagnie choisir pour une première croisière en famille ?</h3><span class="pm">+</span></summary>
+      <div class="rep">Notre relevé familles 2026 place <b>MSC en tête sur le rapport qualité-prix</b>, Royal Caribbean sur les activités ados et Costa sur les départs de proximité.</div>
+    </details>
+  </div>
+</section>
+
+<!-- bulletin -->
+<section class="bulletin" id="bulletin">
+  <div class="wrap">
+    <div class="box">
+      <svg class="stamp-free" viewBox="0 0 96 96" fill="none">
+        <circle cx="48" cy="48" r="44" stroke="#BC3F2C" stroke-width="2.5"/>
+        <circle cx="48" cy="48" r="35" stroke="#BC3F2C" stroke-width="1"/>
+        <text x="48" y="44" text-anchor="middle" font-family="Fragment Mono" font-size="13" fill="#BC3F2C" letter-spacing="1">GRATUIT</text>
+        <text x="48" y="60" text-anchor="middle" font-family="Fragment Mono" font-size="8" fill="#BC3F2C" letter-spacing="1">CHAQUE JEUDI</text>
+      </svg>
+      <div class="head">
+        <span><b>Bulletin du jeudi</b> — émis à 7 h 00 TU</span>
+        <span>Validité : 7 jours</span>
+      </div>
+      <div class="body">
+        <div>
+          <h2>Le bulletin <em>du large</em></h2>
+          <p>Tests, bons plans vérifiés et coulisses des compagnies : l'essentiel de la semaine en mer, résumé en cinq minutes. Déjà 12 400 abonnés à l'écoute.</p>
+        </div>
+        <div>
+          <form onsubmit="return false">
+            <input type="email" placeholder="Votre adresse e-mail" aria-label="Adresse e-mail">
+            <button type="submit">Recevoir</button>
+          </form>
+          <div class="gr">Désinscription en un clic — fréquence hebdomadaire garantie</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- footer -->
+<footer>
+  <div class="wrap">
+    <div class="leg-row">
+      <span class="it"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6" fill="#F0561D"/></svg> Escale = article</span>
+      <span class="it"><svg width="26" height="10" viewBox="0 0 26 10"><path d="M1 5 h24" stroke="#F0561D" stroke-width="2" stroke-dasharray="5 4"/></svg> Route = rubrique</span>
+      <span class="it"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2 v10 M9 12 q-4 -1 -6 -4 M9 12 q4 -1 6 -4" stroke="#8FC1BC" stroke-width="1.8"/></svg> Mouillage = archives</span>
+      <span class="it"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 16 L7 3 h4 l3 13 M3 8 l6 1 M15 8 l-6 1" stroke="#8FC1BC" stroke-width="1.6"/></svg> Phare = méthodologie</span>
+    </div>
+    <div class="fgrid">
+      <div>
+        <div class="fbrand">Le Mag <br><em>Croisières</em></div>
+        <p class="fdesc">Média indépendant. Nous cartographions la croisière : tests en mer, palmarès sondés, guides rectifiés chaque saison.</p>
+      </div>
+      <div class="fcol">
+        <h4>Routes</h4>
+        <a href="#">Destinations</a><a href="#">Compagnies</a><a href="#">Palmarès</a><a href="#">Guides</a><a href="#">Bons plans</a>
+      </div>
+      <div class="fcol">
+        <h4>Le bord</h4>
+        <a href="#">À propos</a><a href="#">Méthodologie</a><a href="#">L'équipage</a><a href="#">Partenariats</a><a href="#">Contact</a>
+      </div>
+      <div class="fcol">
+        <h4>Le groupe Triaina</h4>
+        <a href="#">Les Meilleurs Hôtels &amp; Spas ↗</a>
+        <a href="#">Nos autres médias ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="fbot">
+    <div class="wrap">
+      <span>© 2026 lemagcroisieres.fr — carte nº 01</span>
+      <span>Mentions légales · Confidentialité · Plan du site</span>
+    </div>
+  </div>
+</footer>
+
+<!-- switcher -->
+<div class="switcher">
+  <b>DA RETENUE — CARTE MARINE</b>
+  <span>
+    <a class="on" href="proposition-4-carte-marine.html">4</a>
+    <a href="proposition-7-terminal-depart.html">7</a>
+    <a href="proposition-8-journee-en-mer.html">8</a>
+    <a href="proposition-9-heure-bleue.html">9</a>
+    <a href="./">⌂</a>
+  </span>
+</div>
+
+</body>
+</html>

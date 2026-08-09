@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+# Scripts de génération : rien à explorer.
+Disallow: /outils/
+# La maquette proposition-4-carte-marine.html reste explorable à dessein :
+# c'est sa balise noindex qui la tient hors de l'index, et il faut pouvoir la lire.
+
+# Crawlers IA — autorisés (positionnement « source de référence »)
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+# Fiche d'identité du média pour les moteurs de réponse
+# https://lemagcroisieres.fr/llms.txt
+
+Sitemap: https://lemagcroisieres.fr/sitemap.xml

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page introuvable — Le Mag Croisières</title>
+<meta name="description" content="Cette page n'existe pas ou a été déplacée. Reprenez la navigation depuis la une, les rubriques ou les archives du Mag Croisières.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chart:#EDF3F0;--ink:#0C3140;--ink-2:#3D6472;--deep:#12475A;
+    --buoy:#F0561D;--bathy:#BAD5D2;--paper:#F7FAF8;
+    --sans:"Familjen Grotesk",sans-serif;--mono:"Fragment Mono",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    min-height:100vh;display:flex;flex-direction:column;
+    background:var(--chart);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(rgba(12,49,64,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(12,49,64,.045) 1px,transparent 1px);
+    background-size:130px 130px;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px;width:100%}
+
+  .instr{border-bottom:1.5px solid var(--ink);background:#E4EDE9}
+  .instr .wrap{display:flex;justify-content:space-between;align-items:center;
+    height:44px;gap:16px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    color:var(--ink-2);text-transform:uppercase}
+  .instr b{color:var(--buoy);font-weight:400}
+
+  main{flex:1;display:grid;place-items:center;padding:70px 0}
+  .card{
+    border:1.5px solid var(--ink);background:var(--paper);
+    box-shadow:8px 8px 0 rgba(12,49,64,.2);padding:48px 44px 42px;text-align:center;
+  }
+  .sonde{font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--buoy)}
+  .big{font-family:var(--mono);font-size:clamp(64px,14vw,120px);line-height:1;
+    color:var(--deep);margin:14px 0 6px;letter-spacing:-.03em}
+  h1{font-size:clamp(26px,4.2vw,38px);font-weight:700;letter-spacing:-.02em;
+    text-transform:uppercase;line-height:1.06}
+  h1 em{font-style:italic;color:var(--buoy)}
+  .lede{margin:18px auto 0;max-width:52ch;font-size:16px;line-height:1.6;color:var(--ink-2)}
+
+  .routes{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .routes a{
+    display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.14em;text-transform:uppercase;padding:14px 20px;
+    border:1.5px solid var(--ink);background:var(--chart);box-shadow:3px 3px 0 var(--ink);
+    transition:transform .18s,box-shadow .18s;
+  }
+  .routes a:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .routes a.solid{background:var(--buoy);color:#fff;border-color:var(--ink)}
+
+  .legende{margin-top:30px;padding-top:20px;border-top:1px dashed rgba(12,49,64,.3);
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-2);line-height:2.1}
+  .legende a{border-bottom:1px solid var(--bathy)}
+  .legende a:hover{color:var(--buoy)}
+
+  footer{background:var(--ink);color:#DFEBE8;padding:20px 0;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase}
+  footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  footer a{text-decoration:underline;text-underline-offset:3px}
+  footer a:hover{color:var(--buoy)}
+  @media(max-width:600px){.card{padding:34px 22px 30px}.instr .r{display:none}}
+</style>
+</head>
+<body>
+
+<div class="instr">
+  <div class="wrap">
+    <span>Le Mag <b>Croisières</b></span>
+    <span class="r">Position inconnue — hors des cartes</span>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="card">
+      <div class="sonde">Erreur 404 · sondeur sans écho</div>
+      <div class="big">404</div>
+      <h1>Cette page est <em>hors des cartes</em></h1>
+      <p class="lede">
+        L'adresse demandée n'existe pas, ou l'article a changé de mouillage.
+        Reprenez la navigation par l'un de ces caps — nos quinze articles sont tous
+        accessibles depuis les archives.
+      </p>
+
+      <div class="routes">
+        <a class="solid" href="/">⌂ Retour à la une</a>
+        <a href="/articles/">Tous les articles</a>
+        <a href="/rubriques/">Les rubriques</a>
+      </div>
+
+      <div class="legende">
+        <a href="/rubriques/mediterranee/">Méditerranée</a> ·
+        <a href="/rubriques/caraibes-antilles/">Caraïbes &amp; Antilles</a> ·
+        <a href="/rubriques/grand-nord-poles/">Grand Nord &amp; pôles</a> ·
+        <a href="/rubriques/fleuves/">Fleuves</a> ·
+        <a href="/rubriques/grands-voyages/">Grands voyages</a> ·
+        <a href="/rubriques/luxe-compagnies/">Luxe &amp; avis compagnies</a> ·
+        <a href="/rubriques/guides-pratiques/">Guides pratiques</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 lemagcroisieres.fr</span>
+    <span>
+      <a href="/mentions-legales/">Mentions légales</a> ·
+      <a href="/contact/">Signaler un lien mort</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>
