@@ -11,7 +11,7 @@ USAGE  python3 outils/generer-page-articles.py
 import os, re, json, html
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE = "https://lemagcroisieres.fr"
+BASE = "https://www.lemagcroisieres.fr"
 MOIS = {1: "janvier", 2: "février", 3: "mars", 4: "avril", 5: "mai", 6: "juin",
         7: "juillet", 8: "août", 9: "septembre", 10: "octobre", 11: "novembre", 12: "décembre"}
 

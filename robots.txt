@@ -18,6 +18,6 @@ User-agent: Google-Extended
 Allow: /
 
 # Fiche d'identité du média pour les moteurs de réponse
-# https://lemagcroisieres.fr/llms.txt
+# https://www.lemagcroisieres.fr/llms.txt
 
-Sitemap: https://lemagcroisieres.fr/sitemap.xml
+Sitemap: https://www.lemagcroisieres.fr/sitemap.xml

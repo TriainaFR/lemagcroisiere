@@ -12,7 +12,7 @@ USAGE  python3 outils/generer-llms.py
 import io, os, re, html, datetime
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE = "https://lemagcroisieres.fr"
+BASE = "https://www.lemagcroisieres.fr"
 
 RUBRIQUES = [
     ("mediterranee", "Méditerranée"),

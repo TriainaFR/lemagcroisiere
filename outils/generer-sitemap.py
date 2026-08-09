@@ -8,7 +8,7 @@ USAGE  python3 outils/generer-sitemap.py
 import os, re, datetime, xml.dom.minidom
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE = "https://lemagcroisieres.fr"
+BASE = "https://www.lemagcroisieres.fr"
 # Date du jour, calculée à l'exécution : plus de date figée à corriger à la main.
 AUJOURDHUI = datetime.date.today().isoformat()
 EDITEUR = ["a-propos", "methodologie", "equipage", "partenariats", "contact",

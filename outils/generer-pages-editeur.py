@@ -12,7 +12,7 @@ USAGE  python3 outils/generer-pages-editeur.py
 import os, re, json, html, datetime
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE = "https://lemagcroisieres.fr"
+BASE = "https://www.lemagcroisieres.fr"
 TROU = '<mark class="todo">[À COMPLÉTER]</mark>'
 # Une seule adresse, au domaine du média : aucune adresse Triaina ou Yonder
 # ne doit apparaître sur le site.

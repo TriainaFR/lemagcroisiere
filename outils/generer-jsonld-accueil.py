@@ -13,7 +13,7 @@ USAGE  python3 outils/generer-jsonld-accueil.py
 import io, os, re, json, html
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE = "https://lemagcroisieres.fr"
+BASE = "https://www.lemagcroisieres.fr"
 ACCUEIL = os.path.join(RACINE, "index.html")
 
 DEBUT = "<!-- JSON-LD accueil — généré par outils/generer-jsonld-accueil.py -->"

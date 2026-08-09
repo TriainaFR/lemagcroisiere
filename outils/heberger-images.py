@@ -20,7 +20,7 @@ import io, os, re, sys, json, glob, subprocess, urllib.request
 import concurrent.futures as cf
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE = "https://lemagcroisieres.fr"
+BASE = "https://www.lemagcroisieres.fr"
 DOSSIER = os.path.join(RACINE, "images", "photos")
 PUBLIC = "/images/photos"
 MANIFESTE = os.path.join(DOSSIER, "manifeste.json")

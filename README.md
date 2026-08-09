@@ -1,6 +1,6 @@
 # Le Mag Croisières
 
-Site du média [lemagcroisieres.fr](https://lemagcroisieres.fr) — tests à bord, avis sur les
+Site du média [lemagcroisieres.fr](https://www.lemagcroisieres.fr) — tests à bord, avis sur les
 compagnies, comparatifs d'itinéraires et guides pratiques de la croisière maritime et fluviale.
 
 Site **statique**, sans dépendance ni étape de compilation : le contenu de ce dépôt est servi
