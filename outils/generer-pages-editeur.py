@@ -577,7 +577,8 @@ def main():
             "worksFor": {"@type": "Organization", "name": "Le Mag Croisières", "url": BASE},
             "knowsAbout": ["Croisière maritime", "Croisière fluviale", "Croisière d'expédition"]}},
         corps=f"""        <h2><span class="n">01</span>La rédaction</h2>
-        <p>Toutes les signatures du site correspondent à des personnes réelles. Chaque article indique son auteur, sa date de publication et sa date de dernière révision.</p>
+        <p>À bord, nous tenons sur deux lignes : une rédactrice qui embarque pour de vrai, et une rédaction collective quand un guide s'écrit à plusieurs mains. C'est tout, et c'est assumé — pas de pigiste anonyme, pas de texte acheté au kilo, pas de signature inventée pour faire nombre.</p>
+        <p>Nous préférons publier {n_art} articles dont nous répondons que cinquante que personne n'aurait vérifiés. Chaque texte porte donc le nom de qui l'a écrit, sa date de parution et celle de sa dernière révision : un tarif de croisière vieillit vite, autant que vous sachiez quand nous l'avons relevé.</p>
 
         <div class="fiche perso">
           <div class="portrait">
