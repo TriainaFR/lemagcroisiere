@@ -104,11 +104,18 @@ def reecrire(chemin, table):
         if s != avant:
             n_meta += 1
 
-    # 3. <picture> ne doit pas casser les chaînes de hauteur du CSS
+    # 3. Le fond de la une fait exception : dans `.feat .bg`, qui combine
+    #    position absolue, will-change et une animation Ken Burns, l'AVIF
+    #    sélectionné par <picture> se décode mais n'est jamais peint — la une
+    #    reste vide. On y sert le JPEG en <img> simple. Constaté le 11 août 2026.
+    s = re.sub(r'(<span class="bg" id="featbg">\s*)<picture><source[^>]*>(<img[^>]*>)</picture>',
+               r"\1\2", s)
+
+    # 4. <picture> ne doit pas casser les chaînes de hauteur du CSS
     if "picture{display:contents}" not in s and n_img:
         s = s.replace("<style>", "<style>\n  picture{display:contents}", 1)
 
-    # 4. le préconnect vers Unsplash n'a plus lieu d'être
+    # 5. le préconnect vers Unsplash n'a plus lieu d'être
     s = re.sub(r'\s*<link rel="preconnect" href="https://images\.unsplash\.com"[^>]*>', "", s)
     return s, n_img, n_meta
 
