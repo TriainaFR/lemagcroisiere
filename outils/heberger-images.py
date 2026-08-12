@@ -97,16 +97,28 @@ def reecrire(chemin, table):
 
     s = re.sub(r"<img\s[^>]*>", img, s)
 
-    # 2. métadonnées sociales et JSON-LD : URL absolues sur notre domaine
+    # 2. métadonnées sociales et JSON-LD : URL absolues sur notre domaine.
+    #    Attention : ne jamais toucher src ni srcset, qui doivent rester
+    #    racine-relatifs — sinon la prévisualisation locale se casse.
     for complete, nom in table.items():
         avant = s
-        s = s.replace('"%s"' % complete, '"%s%s/%s.jpg"' % (BASE, PUBLIC, nom))
+        absolue = '"%s%s/%s.jpg"' % (BASE, PUBLIC, nom)
+        for prefixe in ('content=', '"url": ', '"image": ', '"contentUrl": '):
+            s = s.replace(prefixe + '"%s"' % complete, prefixe + absolue)
         if s != avant:
             n_meta += 1
 
-    # 3. Le fond de la une fait exception : dans `.feat .bg`, qui combine
-    #    position absolue, will-change et une animation Ken Burns, l'AVIF
-    #    sélectionné par <picture> se décode mais n'est jamais peint — la une
+    # 2 bis. ce qui reste d'URL Unsplash dans un src ou un srcset passe en local
+    for complete, nom in table.items():
+        avant = s
+        for attribut in ("src", "srcset"):
+            s = s.replace('%s="%s"' % (attribut, complete),
+                          '%s="%s/%s.jpg"' % (attribut, PUBLIC, nom))
+        if s != avant:
+            n_img += 1
+
+    # 3. Le fond de la une fait exception : dans `.feat .bg`, l'AVIF
+    #    sélectionné par <picture> se décode mais n'est jamais peint, et la une
     #    reste vide. On y sert le JPEG en <img> simple. Constaté le 11 août 2026.
     s = re.sub(r'(<span class="bg" id="featbg">\s*)<picture><source[^>]*>(<img[^>]*>)</picture>',
                r"\1\2", s)
