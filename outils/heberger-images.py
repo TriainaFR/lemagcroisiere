@@ -69,6 +69,18 @@ def telecharger(args):
     except Exception as e:
         return nom, 0, 0, "ÉCHEC : %s" % e
     open(jpg, "wb").write(donnees)
+    # `sips` écrit un AVIF vide — dimensions correctes, aucun pixel — quand la
+    # hauteur est impaire. Constaté le 20 août 2026 sur 20 fichiers du site.
+    # On recadre donc systématiquement à des dimensions paires avant d'encoder.
+    d = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", jpg],
+                       capture_output=True, text=True).stdout
+    mw = re.search(r"pixelWidth:\s*(\d+)", d)
+    mh = re.search(r"pixelHeight:\s*(\d+)", d)
+    if mw and mh:
+        w, h = int(mw.group(1)), int(mh.group(1))
+        if w % 2 or h % 2:
+            subprocess.run(["sips", "-c", str(h - h % 2), str(w - w % 2), jpg, "--out", jpg],
+                           capture_output=True)
     r = subprocess.run(["sips", "-s", "format", "avif",
                         "-s", "formatOptions", QUALITE_AVIF, jpg, "--out", avif],
                        capture_output=True)
